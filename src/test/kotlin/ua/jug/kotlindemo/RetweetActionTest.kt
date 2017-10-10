@@ -12,11 +12,12 @@ import twitter4j.Twitter
 
 class RetweetActionTest : FunSpec() {
     init {
+        val twitter: Twitter = mock()
+
         test ("do not retweet reetweets") {
             val status: Status = mock{
                 on {isRetweet} doReturn true
             }
-            val twitter: Twitter = mock()
             val action = RetweetAction(twitter)
 
             action.accept(status)
@@ -28,7 +29,6 @@ class RetweetActionTest : FunSpec() {
             val status: Status = mock{
                 on {isRetweet} doReturn false
             }
-            val twitter: Twitter = mock()
             val action = RetweetAction(twitter)
 
             action.accept(status)
@@ -41,9 +41,8 @@ class RetweetActionTest : FunSpec() {
             val status: Status = mock{
                 on {isRetweet} doReturn false
                 on {id} doReturn tweetId
-
             }
-            val twitter: Twitter = mock()
+
             val action = RetweetAction(twitter)
 
             action.accept(status)
@@ -58,7 +57,6 @@ class RetweetActionTest : FunSpec() {
                 on {id} doReturn tweetId
 
             }
-            val twitter: Twitter = mock()
             val action = RetweetAction(twitter)
 
             action.accept(status)
@@ -72,14 +70,28 @@ class RetweetActionTest : FunSpec() {
                 on {isRetweet} doReturn false
                 on {id} doReturn tweetId
                 on {isRetweetedByMe} doReturn true
-
             }
-            val twitter: Twitter = mock()
+
             val action = RetweetAction(twitter)
 
             action.accept(status)
 
             verify(twitter, never()).retweetStatus(tweetId)
+        }
+
+        test("do not retweet if tweete text contains stop words") {
+            val stopWords = listOf<String>("bad", "ugly")
+
+            val status : Status = mock{
+                on{isRetweet} doReturn false
+                on{isRetweetedByMe} doReturn false
+                on{text} doReturn "very ugly talk"
+            }
+
+            val action = RetweetAction(twitter, stopWords)
+            action.accept(status)
+
+            verify(twitter, never()).retweetStatus(anyLong())
         }
     }
 }

@@ -12,15 +12,17 @@ import twitter4j.TwitterStream
 import twitter4j.util.function.Consumer
 
 class TwitterBotTest : FunSpec() {
-    val emptyAction: Consumer<Status> = Consumer {  }
+    val stream: TwitterStream = mock {
+        on {onStatus(any())} doReturn it
+    }
 
     init {
         test("create TwitterBot") {
-            TwitterBot(action = emptyAction)
+            TwitterBot(stream)
         }
 
         test("fail to subscribe for empty tags") {
-            val bot = TwitterBot(action = emptyAction)
+            val bot = TwitterBot(stream)
 
             val exception = shouldThrow<IllegalArgumentException> {
                 bot.subscribe()
@@ -29,7 +31,7 @@ class TwitterBotTest : FunSpec() {
         }
 
         test("fail to subscribe for blank tags") {
-            val bot = TwitterBot(action = emptyAction)
+            val bot = TwitterBot(stream)
 
             shouldThrow<IllegalArgumentException> {
                 bot.subscribe("", " ", "      ")
@@ -38,21 +40,13 @@ class TwitterBotTest : FunSpec() {
         }
 
         test("filter when subscribe for one tag") {
-            val stream: TwitterStream = mock {
-                on {onStatus(any())} doReturn it
-            }
-
-            val bot = TwitterBot(stream, emptyAction)
+            val bot = TwitterBot(stream)
 
             bot.subscribe("#tag")
             verify(stream).filter("#tag")
         }
 
         test("subscribe for one tag") {
-            val stream: TwitterStream = mock {
-                on {onStatus(any())} doReturn it
-            }
-
             val action = Consumer<Status> { println("I'm consumer!") }
             val bot = TwitterBot(stream, action)
 
