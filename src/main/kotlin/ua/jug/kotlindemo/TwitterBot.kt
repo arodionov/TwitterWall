@@ -10,7 +10,7 @@ class TwitterBot(val twitterStream: TwitterStream = TwitterStreamFactory.getSing
     fun subscribe(vararg tags: String) {
         val filteredTags = tags.filter { it.isNotBlank() }
         if (filteredTags.isEmpty())
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Empty tags")
 
         twitterStream
                 .onStatus(action)

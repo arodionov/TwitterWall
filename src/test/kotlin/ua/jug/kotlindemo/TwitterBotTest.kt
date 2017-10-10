@@ -4,6 +4,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.specs.FunSpec
 import twitter4j.Status
@@ -11,27 +12,29 @@ import twitter4j.TwitterStream
 import twitter4j.util.function.Consumer
 
 class TwitterBotTest : FunSpec() {
-    val empptyAction: Consumer<Status> = Consumer {  }
+    val emptyAction: Consumer<Status> = Consumer {  }
 
     init {
         test("create TwitterBot") {
-            TwitterBot(action = empptyAction)
+            TwitterBot(action = emptyAction)
         }
 
         test("fail to subscribe for empty tags") {
-            val bot = TwitterBot(action = empptyAction)
+            val bot = TwitterBot(action = emptyAction)
 
-            shouldThrow<IllegalArgumentException> {
+            val exception = shouldThrow<IllegalArgumentException> {
                 bot.subscribe()
             }
+            exception.message shouldBe "Empty tags"
         }
 
         test("fail to subscribe for blank tags") {
-            val bot = TwitterBot(action = empptyAction)
+            val bot = TwitterBot(action = emptyAction)
 
             shouldThrow<IllegalArgumentException> {
                 bot.subscribe("", " ", "      ")
-            }
+            }.message shouldBe "Empty tags"
+
         }
 
         test("filter when subscribe for one tag") {
@@ -39,7 +42,7 @@ class TwitterBotTest : FunSpec() {
                 on {onStatus(any())} doReturn it
             }
 
-            val bot = TwitterBot(stream, empptyAction)
+            val bot = TwitterBot(stream, emptyAction)
 
             bot.subscribe("#tag")
             verify(stream).filter("#tag")
