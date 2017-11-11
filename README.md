@@ -1,4 +1,4 @@
-# TwitterBot
+# TwitterWall
 
 To make this bot connect to Twitter you need to add twitter4j.properties file to resources folder. This file should contain these lines:
 
