@@ -8,7 +8,7 @@ import ua.jug.kotlindemo.TwitterBot
 import ua.jug.buffer.BoundedBuffer
 import ua.jug.buffer.Buffer
 
-class TwitterWall(twitterStream: TwitterStream, val hashtags: List<String>, val size: Int = 10) {
+class TwitterWall(bufUpdFun: (Buffer<String>, List<String>) -> Unit, val hashtags: List<String>, val size: Int = 10) {
 
     private val buffer: Buffer<String> = BoundedBuffer(size)
 
@@ -16,20 +16,12 @@ class TwitterWall(twitterStream: TwitterStream, val hashtags: List<String>, val 
         val filteredHashtags = hashtags.filter { !it.isBlank() }
         if(filteredHashtags.isEmpty()) throw IllegalArgumentException("Empty list")
 
-        TwitterBot(twitterStream,
-                Consumer { status ->  buffer.put(status.text) }
-        ).subscribe(* hashtags.toTypedArray())
+        bufUpdFun(buffer, hashtags)
     }
 
-    fun fillBuffer(fillFun: () -> List<String>) {
-       fillFun().take(size).forEach { buffer.put(it) }
-    }
 
-    internal fun searchTweets(twitter: Twitter): List<String> {
-        val query = Query(hashtags[0])
-        val result = twitter.search(query)
-        return result.tweets
-                .map { status -> status.text }
+    fun fillBuffer(fillFun: (List<String>) -> List<String>) {
+       fillFun(hashtags).take(size).forEach { buffer.put(it) }
     }
 
     fun tweets(): List<String> = buffer.buffer().reversed()
