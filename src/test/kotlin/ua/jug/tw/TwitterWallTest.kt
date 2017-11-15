@@ -1,14 +1,11 @@
 package ua.jug.tw
 
 import com.nhaarman.mockito_kotlin.mock
-import io.kotlintest.matchers.*
-
-import io.kotlintest.properties.forAll
+import io.kotlintest.matchers.gt
+import io.kotlintest.matchers.lte
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.specs.FunSpec
-import org.hamcrest.CoreMatchers
-import org.hamcrest.core.Every.everyItem
-import twitter4j.Twitter
-import twitter4j.TwitterFactory
 import twitter4j.TwitterStream
 
 class TwitterWallTest : FunSpec() {
