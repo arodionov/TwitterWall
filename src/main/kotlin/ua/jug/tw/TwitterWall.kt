@@ -1,10 +1,5 @@
 package ua.jug.tw
 
-import twitter4j.Query
-import twitter4j.Twitter
-import twitter4j.TwitterStream
-import twitter4j.util.function.Consumer
-import ua.jug.kotlindemo.TwitterBot
 import ua.jug.buffer.BoundedBuffer
 import ua.jug.buffer.Buffer
 
